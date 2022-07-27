@@ -1,0 +1,1720 @@
+   1               		.file	"LCD.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  11               	lcd_send_half_byte:
+  12               	.LVL0:
+  13               	.LFB10:
+  14               		.file 1 "LCD.c"
+   1:LCD.c         **** #include <avr/io.h>
+   2:LCD.c         **** #include <util/delay.h>
+   3:LCD.c         **** #include <stdlib.h>
+   4:LCD.c         **** #define LCD_PORT_DDR DDRB
+   5:LCD.c         **** #define LCD_PORT PORTB
+   6:LCD.c         **** // poniżej połączenia są definiowane. Kolejne wejścia LCD do pinów portu B
+   7:LCD.c         **** #define LCD_RS 0 //PB_0, więc pierwsze (RS) podłączamy do PB_0
+   8:LCD.c         **** #define LCD_E 1
+   9:LCD.c         **** #define LCD_D4 2
+  10:LCD.c         **** #define LCD_D5 3
+  11:LCD.c         **** #define LCD_D6 4
+  12:LCD.c         **** #define LCD_D7 5
+  13:LCD.c         **** #define SET_RS LCD_PORT |=(1<<LCD_RS)
+  14:LCD.c         **** #define SET_E LCD_PORT |=(1<<LCD_E)
+  15:LCD.c         **** #define CLR_RS LCD_PORT &=~(1<<LCD_RS)
+  16:LCD.c         **** #define CLR_E LCD_PORT &=~(1<<LCD_E)
+  17:LCD.c         **** 
+  18:LCD.c         **** //funkcja wysyłająca 4 bity 
+  19:LCD.c         **** static inline void lcd_send_half_byte(uint8_t data) //uzywana tylko w tym bloku i dla tej bibliotek
+  20:LCD.c         **** {
+  15               		.loc 1 20 1 view -0
+  16               		.cfi_startproc
+  17               	/* prologue: function */
+  18               	/* frame size = 0 */
+  19               	/* stack size = 0 */
+  20               	.L__stack_usage = 0
+  21:LCD.c         **** 	SET_E;
+  21               		.loc 1 21 2 view .LVU1
+  22 0000 C19A      		sbi 0x18,1
+  22:LCD.c         **** 	if (data & (1<<0)) LCD_PORT |=(1<< LCD_D4); else LCD_PORT &=~(1 << LCD_D4);
+  23               		.loc 1 22 2 view .LVU2
+  24               		.loc 1 22 5 is_stmt 0 view .LVU3
+  25 0002 80FF      		sbrs r24,0
+  26 0004 00C0      		rjmp .L2
+  27               		.loc 1 22 21 is_stmt 1 discriminator 1 view .LVU4
+  28               		.loc 1 22 30 is_stmt 0 discriminator 1 view .LVU5
+  29 0006 C29A      		sbi 0x18,2
+  30               	.L3:
+  23:LCD.c         **** 	if (data & (1<<1)) LCD_PORT |=(1<< LCD_D5); else LCD_PORT &=~(1 << LCD_D5);
+  31               		.loc 1 23 2 is_stmt 1 view .LVU6
+  32               		.loc 1 23 5 is_stmt 0 view .LVU7
+  33 0008 81FF      		sbrs r24,1
+  34 000a 00C0      		rjmp .L4
+  35               		.loc 1 23 21 is_stmt 1 discriminator 1 view .LVU8
+  36               		.loc 1 23 30 is_stmt 0 discriminator 1 view .LVU9
+  37 000c C39A      		sbi 0x18,3
+  38               	.L5:
+  24:LCD.c         **** 	if (data & (1<<2)) LCD_PORT |=(1<< LCD_D6); else LCD_PORT &=~(1 << LCD_D6);
+  39               		.loc 1 24 2 is_stmt 1 view .LVU10
+  40               		.loc 1 24 5 is_stmt 0 view .LVU11
+  41 000e 82FF      		sbrs r24,2
+  42 0010 00C0      		rjmp .L6
+  43               		.loc 1 24 21 is_stmt 1 discriminator 1 view .LVU12
+  44               		.loc 1 24 30 is_stmt 0 discriminator 1 view .LVU13
+  45 0012 C49A      		sbi 0x18,4
+  46               	.L7:
+  25:LCD.c         **** 	if (data & (1<<3)) LCD_PORT |=(1<< LCD_D7); else LCD_PORT &=~(1 << LCD_D7);
+  47               		.loc 1 25 2 is_stmt 1 view .LVU14
+  48               		.loc 1 25 5 is_stmt 0 view .LVU15
+  49 0014 83FF      		sbrs r24,3
+  50 0016 00C0      		rjmp .L8
+  51               		.loc 1 25 21 is_stmt 1 discriminator 1 view .LVU16
+  52               		.loc 1 25 30 is_stmt 0 discriminator 1 view .LVU17
+  53 0018 C59A      		sbi 0x18,5
+  54               	.L9:
+  26:LCD.c         **** 	CLR_E;
+  55               		.loc 1 26 2 is_stmt 1 view .LVU18
+  56 001a C198      		cbi 0x18,1
+  57               	/* epilogue start */
+  27:LCD.c         **** }
+  58               		.loc 1 27 1 is_stmt 0 view .LVU19
+  59 001c 0895      		ret
+  60               	.L2:
+  22:LCD.c         **** 	if (data & (1<<1)) LCD_PORT |=(1<< LCD_D5); else LCD_PORT &=~(1 << LCD_D5);
+  61               		.loc 1 22 51 is_stmt 1 discriminator 2 view .LVU20
+  22:LCD.c         **** 	if (data & (1<<1)) LCD_PORT |=(1<< LCD_D5); else LCD_PORT &=~(1 << LCD_D5);
+  62               		.loc 1 22 60 is_stmt 0 discriminator 2 view .LVU21
+  63 001e C298      		cbi 0x18,2
+  64 0020 00C0      		rjmp .L3
+  65               	.L4:
+  23:LCD.c         **** 	if (data & (1<<2)) LCD_PORT |=(1<< LCD_D6); else LCD_PORT &=~(1 << LCD_D6);
+  66               		.loc 1 23 51 is_stmt 1 discriminator 2 view .LVU22
+  23:LCD.c         **** 	if (data & (1<<2)) LCD_PORT |=(1<< LCD_D6); else LCD_PORT &=~(1 << LCD_D6);
+  67               		.loc 1 23 60 is_stmt 0 discriminator 2 view .LVU23
+  68 0022 C398      		cbi 0x18,3
+  69 0024 00C0      		rjmp .L5
+  70               	.L6:
+  24:LCD.c         **** 	if (data & (1<<3)) LCD_PORT |=(1<< LCD_D7); else LCD_PORT &=~(1 << LCD_D7);
+  71               		.loc 1 24 51 is_stmt 1 discriminator 2 view .LVU24
+  24:LCD.c         **** 	if (data & (1<<3)) LCD_PORT |=(1<< LCD_D7); else LCD_PORT &=~(1 << LCD_D7);
+  72               		.loc 1 24 60 is_stmt 0 discriminator 2 view .LVU25
+  73 0026 C498      		cbi 0x18,4
+  74 0028 00C0      		rjmp .L7
+  75               	.L8:
+  25:LCD.c         **** 	CLR_E;
+  76               		.loc 1 25 51 is_stmt 1 discriminator 2 view .LVU26
+  25:LCD.c         **** 	CLR_E;
+  77               		.loc 1 25 60 is_stmt 0 discriminator 2 view .LVU27
+  78 002a C598      		cbi 0x18,5
+  79 002c 00C0      		rjmp .L9
+  80               		.cfi_endproc
+  81               	.LFE10:
+  83               	.global	lcd_write_byte
+  85               	lcd_write_byte:
+  86               	.LVL1:
+  87               	.LFB11:
+  28:LCD.c         **** void lcd_write_byte(uint8_t data)
+  29:LCD.c         **** {
+  88               		.loc 1 29 1 is_stmt 1 view -0
+  89               		.cfi_startproc
+  90               		.loc 1 29 1 is_stmt 0 view .LVU29
+  91 002e CF93      		push r28
+  92               	.LCFI0:
+  93               		.cfi_def_cfa_offset 3
+  94               		.cfi_offset 28, -2
+  95               	/* prologue: function */
+  96               	/* frame size = 0 */
+  97               	/* stack size = 1 */
+  98               	.L__stack_usage = 1
+  99 0030 C82F      		mov r28,r24
+  30:LCD.c         **** 	lcd_send_half_byte(data >> 4); //przesłanie najstarszych bitów, najbardziej znaczących MSB
+ 100               		.loc 1 30 2 is_stmt 1 view .LVU30
+ 101 0032 8295      		swap r24
+ 102               	.LVL2:
+ 103               		.loc 1 30 2 is_stmt 0 view .LVU31
+ 104 0034 8F70      		andi r24,lo8(15)
+ 105 0036 0E94 0000 		call lcd_send_half_byte
+ 106               	.LVL3:
+  31:LCD.c         **** 	_delay_us(120);
+ 107               		.loc 1 31 2 is_stmt 1 view .LVU32
+ 108               	.LBB34:
+ 109               	.LBI34:
+ 110               		.file 2 "c:\\avr-gcc-10.1.0-x64-windows\\avr\\include\\util\\delay.h"
+   1:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** /* Copyright (c) 2002, Marek Michalkiewicz
+   2:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    Copyright (c) 2004,2005,2007 Joerg Wunsch
+   3:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    Copyright (c) 2007  Florin-Viorel Petrov
+   4:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    All rights reserved.
+   5:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+   6:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    Redistribution and use in source and binary forms, with or without
+   7:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    modification, are permitted provided that the following conditions are met:
+   8:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+   9:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    * Redistributions of source code must retain the above copyright
+  10:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****      notice, this list of conditions and the following disclaimer.
+  11:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  12:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    * Redistributions in binary form must reproduce the above copyright
+  13:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****      notice, this list of conditions and the following disclaimer in
+  14:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****      the documentation and/or other materials provided with the
+  15:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****      distribution.
+  16:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  17:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    * Neither the name of the copyright holders nor the names of
+  18:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****      contributors may be used to endorse or promote products derived
+  19:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****      from this software without specific prior written permission.
+  20:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  21:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  22:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  23:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  24:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  25:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  26:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  27:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  28:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  29:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  30:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  31:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   POSSIBILITY OF SUCH DAMAGE. */
+  32:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  33:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** /* $Id$ */
+  34:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  35:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #ifndef _UTIL_DELAY_H_
+  36:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #define _UTIL_DELAY_H_ 1
+  37:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  38:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #ifndef __DOXYGEN__
+  39:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #  ifndef __HAS_DELAY_CYCLES
+  40:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #    define __HAS_DELAY_CYCLES 1
+  41:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #  endif
+  42:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #endif  /* __DOXYGEN__ */
+  43:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  44:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #include <inttypes.h>
+  45:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #include <util/delay_basic.h>
+  46:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #include <math.h>
+  47:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  48:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** /** \file */
+  49:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** /** \defgroup util_delay <util/delay.h>: Convenience functions for busy-wait delay loops
+  50:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     \code
+  51:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     #define F_CPU 1000000UL  // 1 MHz
+  52:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     //#define F_CPU 14.7456E6
+  53:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     #include <util/delay.h>
+  54:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     \endcode
+  55:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  56:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     \note As an alternative method, it is possible to pass the
+  57:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     F_CPU macro down to the compiler from the Makefile.
+  58:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     Obviously, in that case, no \c \#define statement should be
+  59:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     used.
+  60:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  61:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     The functions in this header file are wrappers around the basic
+  62:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     busy-wait functions from <util/delay_basic.h>.  They are meant as
+  63:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     convenience functions where actual time values can be specified
+  64:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     rather than a number of cycles to wait for.  The idea behind is
+  65:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     that compile-time constant expressions will be eliminated by
+  66:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     compiler optimization so floating-point expressions can be used
+  67:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     to calculate the number of delay cycles needed based on the CPU
+  68:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     frequency passed by the macro F_CPU.
+  69:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  70:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     \note In order for these functions to work as intended, compiler
+  71:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     optimizations <em>must</em> be enabled, and the delay time
+  72:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     <em>must</em> be an expression that is a known constant at
+  73:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     compile-time.  If these requirements are not met, the resulting
+  74:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     delay will be much longer (and basically unpredictable), and
+  75:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     applications that otherwise do not use floating-point calculations
+  76:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     will experience severe code bloat by the floating-point library
+  77:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     routines linked into the application.
+  78:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  79:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     The functions available allow the specification of microsecond, and
+  80:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     millisecond delays directly, using the application-supplied macro
+  81:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     F_CPU as the CPU clock frequency (in Hertz).
+  82:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  83:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** */
+  84:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  85:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if !defined(__DOXYGEN__)
+  86:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** static __inline__ void _delay_us(double __us) __attribute__((__always_inline__));
+  87:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** static __inline__ void _delay_ms(double __ms) __attribute__((__always_inline__));
+  88:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #endif
+  89:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  90:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #ifndef F_CPU
+  91:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** /* prevent compiler error by supplying a default */
+  92:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** # warning "F_CPU not defined for <util/delay.h>"
+  93:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** /** \ingroup util_delay
+  94:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     \def F_CPU
+  95:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     \brief CPU frequency in Hz
+  96:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+  97:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     The macro F_CPU specifies the CPU frequency to be considered by
+  98:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     the delay macros.  This macro is normally supplied by the
+  99:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     environment (e.g. from within a project header, or the project's
+ 100:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     Makefile).  The value 1 MHz here is only provided as a "vanilla"
+ 101:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     fallback if no such user-provided definition could be found.
+ 102:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 103:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     In terms of the delay functions, the CPU frequency can be given as
+ 104:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     a floating-point constant (e.g. 3.6864E6 for 3.6864 MHz).
+ 105:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     However, the macros in <util/setbaud.h> require it to be an
+ 106:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****     integer value.
+ 107:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****  */
+ 108:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** # define F_CPU 1000000UL
+ 109:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #endif
+ 110:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 111:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #ifndef __OPTIMIZE__
+ 112:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** # warning "Compiler optimizations disabled; functions from <util/delay.h> won't work as designed"
+ 113:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #endif
+ 114:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 115:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 116:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 117:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   __STDC_HOSTED__
+ 118:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #  include <math.h>
+ 119:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #endif
+ 120:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 121:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** /**
+ 122:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    \ingroup util_delay
+ 123:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 124:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    Perform a delay of \c __ms milliseconds, using _delay_loop_2().
+ 125:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 126:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    The macro F_CPU is supposed to be defined to a
+ 127:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    constant defining the CPU clock frequency (in Hertz).
+ 128:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 129:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    The maximal possible delay is 262.14 ms / F_CPU in MHz.
+ 130:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 131:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    When the user request delay which exceed the maximum possible one,
+ 132:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    _delay_ms() provides a decreased resolution functionality. In this
+ 133:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    mode _delay_ms() will work with a resolution of 1/10 ms, providing
+ 134:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    delays up to 6.5535 seconds (independent from CPU frequency).  The
+ 135:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    user will not be informed about decreased resolution.
+ 136:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 137:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    If the avr-gcc toolchain has __builtin_avr_delay_cycles()
+ 138:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    support, maximal possible delay is 4294967.295 ms/ F_CPU in MHz. For
+ 139:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    values greater than the maximal possible delay, overflows results in
+ 140:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    no delay i.e., 0ms.
+ 141:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 142:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    Conversion of \c __ms into clock cycles may not always result in
+ 143:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    integer.  By default, the clock cycles rounded up to next
+ 144:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    integer. This ensures that the user gets at least \c __ms
+ 145:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    microseconds of delay.
+ 146:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 147:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    Alternatively, by defining the macro \c __DELAY_ROUND_DOWN__, or
+ 148:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    \c __DELAY_ROUND_CLOSEST__, before including this header file, the
+ 149:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    algorithm can be made to round down, or round to closest integer,
+ 150:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    respectively.
+ 151:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 152:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    \note
+ 153:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 154:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    The implementation of _delay_ms() based on
+ 155:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    __builtin_avr_delay_cycles() is not backward compatible with older
+ 156:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    implementations.  In order to get functionality backward compatible
+ 157:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    with previous versions, the macro \c "__DELAY_BACKWARD_COMPATIBLE__"
+ 158:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    must be defined before including this header file. Also, the
+ 159:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    backward compatible algorithm will be chosen if the code is
+ 160:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    compiled in a <em>freestanding environment</em> (GCC option
+ 161:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    \c -ffreestanding), as the math functions required for rounding are
+ 162:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    not available to the compiler then.
+ 163:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 164:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****  */
+ 165:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** void
+ 166:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** _delay_ms(double __ms)
+ 167:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 168:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	double __tmp ;
+ 169:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 170:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 171:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   __STDC_HOSTED__
+ 172:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	uint32_t __ticks_dc;
+ 173:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 174:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 175:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 176:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#if defined(__DELAY_ROUND_DOWN__)
+ 177:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		__ticks_dc = (uint32_t)fabs(__tmp);
+ 178:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 179:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#elif defined(__DELAY_ROUND_CLOSEST__)
+ 180:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		__ticks_dc = (uint32_t)(fabs(__tmp)+0.5);
+ 181:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 182:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#else
+ 183:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		//round up by default
+ 184:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+ 185:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 186:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__builtin_avr_delay_cycles(__ticks_dc);
+ 188:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 189:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #else
+ 190:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	uint16_t __ticks;
+ 191:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 4e3) * __ms;
+ 192:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	if (__tmp < 1.0)
+ 193:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		__ticks = 1;
+ 194:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	else if (__tmp > 65535)
+ 195:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	{
+ 196:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		//	__ticks = requested delay in 1/10 ms
+ 197:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		__ticks = (uint16_t) (__ms * 10.0);
+ 198:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		while(__ticks)
+ 199:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		{
+ 200:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 			// wait 1/10 ms
+ 201:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 			_delay_loop_2(((F_CPU) / 4e3) / 10);
+ 202:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 			__ticks --;
+ 203:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		}
+ 204:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		return;
+ 205:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	}
+ 206:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	else
+ 207:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		__ticks = (uint16_t)__tmp;
+ 208:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	_delay_loop_2(__ticks);
+ 209:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #endif
+ 210:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** }
+ 211:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 212:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** /**
+ 213:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    \ingroup util_delay
+ 214:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 215:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    Perform a delay of \c __us microseconds, using _delay_loop_1().
+ 216:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 217:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    The macro F_CPU is supposed to be defined to a
+ 218:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    constant defining the CPU clock frequency (in Hertz).
+ 219:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 220:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    The maximal possible delay is 768 us / F_CPU in MHz.
+ 221:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 222:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    If the user requests a delay greater than the maximal possible one,
+ 223:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    _delay_us() will automatically call _delay_ms() instead.  The user
+ 224:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    will not be informed about this case.
+ 225:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 226:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    If the avr-gcc toolchain has __builtin_avr_delay_cycles()
+ 227:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    support, maximal possible delay is 4294967.295 us/ F_CPU in MHz. For
+ 228:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    values greater than the maximal possible delay, overflow results in
+ 229:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    no delay i.e., 0us.
+ 230:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 231:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    Conversion of \c __us into clock cycles may not always result in
+ 232:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    integer.  By default, the clock cycles rounded up to next
+ 233:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    integer. This ensures that the user gets at least \c __us
+ 234:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    microseconds of delay.
+ 235:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 236:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    Alternatively, by defining the macro \c __DELAY_ROUND_DOWN__, or
+ 237:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    \c __DELAY_ROUND_CLOSEST__, before including this header file, the
+ 238:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    algorithm can be made to round down, or round to closest integer,
+ 239:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    respectively.
+ 240:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 241:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    \note
+ 242:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 243:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    The implementation of _delay_ms() based on
+ 244:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    __builtin_avr_delay_cycles() is not backward compatible with older
+ 245:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    implementations.  In order to get functionality backward compatible
+ 246:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    with previous versions, the macro \c __DELAY_BACKWARD_COMPATIBLE__
+ 247:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    must be defined before including this header file. Also, the
+ 248:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    backward compatible algorithm will be chosen if the code is
+ 249:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    compiled in a <em>freestanding environment</em> (GCC option
+ 250:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    \c -ffreestanding), as the math functions required for rounding are
+ 251:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****    not available to the compiler then.
+ 252:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 253:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****  */
+ 254:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** void
+ 255:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** _delay_us(double __us)
+ 111               		.loc 2 255 1 view .LVU33
+ 112               	.LBB35:
+ 256:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 257:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	double __tmp ;
+ 113               		.loc 2 257 2 view .LVU34
+ 258:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 259:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 260:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h ****   __STDC_HOSTED__
+ 261:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	uint32_t __ticks_dc;
+ 114               		.loc 2 261 2 view .LVU35
+ 262:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 115               		.loc 2 262 2 view .LVU36
+ 263:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e6) * __us;
+ 116               		.loc 2 263 2 view .LVU37
+ 264:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 265:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#if defined(__DELAY_ROUND_DOWN__)
+ 266:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		__ticks_dc = (uint32_t)fabs(__tmp);
+ 267:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 268:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#elif defined(__DELAY_ROUND_CLOSEST__)
+ 269:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		__ticks_dc = (uint32_t)(fabs(__tmp)+0.5);
+ 270:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 271:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#else
+ 272:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		//round up by default
+ 273:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+ 117               		.loc 2 273 3 view .LVU38
+ 274:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 275:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 276:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__builtin_avr_delay_cycles(__ticks_dc);
+ 118               		.loc 2 276 2 view .LVU39
+ 119 003a 8FED      		ldi r24,lo8(479)
+ 120 003c 91E0      		ldi r25,hi8(479)
+ 121 003e 0197      	1:	sbiw r24,1
+ 122 0040 01F4      		brne 1b
+ 123 0042 00C0      		rjmp .
+ 124 0044 0000      		nop
+ 125               	.LVL4:
+ 126               		.loc 2 276 2 is_stmt 0 view .LVU40
+ 127               	.LBE35:
+ 128               	.LBE34:
+  32:LCD.c         **** 	lcd_send_half_byte(data); //przesłanie najmłodszych bitów, najmniej znaczących LSB
+ 129               		.loc 1 32 2 is_stmt 1 view .LVU41
+ 130 0046 8C2F      		mov r24,r28
+ 131 0048 0E94 0000 		call lcd_send_half_byte
+ 132               	.LVL5:
+  33:LCD.c         **** 	_delay_us(120);
+ 133               		.loc 1 33 2 view .LVU42
+ 134               	.LBB36:
+ 135               	.LBI36:
+ 255:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 136               		.loc 2 255 1 view .LVU43
+ 137               	.LBB37:
+ 257:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 138               		.loc 2 257 2 view .LVU44
+ 261:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 139               		.loc 2 261 2 view .LVU45
+ 262:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e6) * __us;
+ 140               		.loc 2 262 2 view .LVU46
+ 263:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 141               		.loc 2 263 2 view .LVU47
+ 273:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 142               		.loc 2 273 3 view .LVU48
+ 143               		.loc 2 276 2 view .LVU49
+ 144 004c 8FED      		ldi r24,lo8(479)
+ 145 004e 91E0      		ldi r25,hi8(479)
+ 146 0050 0197      	1:	sbiw r24,1
+ 147 0052 01F4      		brne 1b
+ 148 0054 00C0      		rjmp .
+ 149 0056 0000      		nop
+ 150               	.LVL6:
+ 151               	/* epilogue start */
+ 152               		.loc 2 276 2 is_stmt 0 view .LVU50
+ 153               	.LBE37:
+ 154               	.LBE36:
+  34:LCD.c         **** }
+ 155               		.loc 1 34 1 view .LVU51
+ 156 0058 CF91      		pop r28
+ 157               	.LVL7:
+ 158               		.loc 1 34 1 view .LVU52
+ 159 005a 0895      		ret
+ 160               		.cfi_endproc
+ 161               	.LFE11:
+ 163               	.global	lcd_write_cmd
+ 165               	lcd_write_cmd:
+ 166               	.LVL8:
+ 167               	.LFB12:
+  35:LCD.c         **** 
+  36:LCD.c         **** void lcd_write_cmd(uint8_t cmd)
+  37:LCD.c         **** {
+ 168               		.loc 1 37 1 is_stmt 1 view -0
+ 169               		.cfi_startproc
+ 170               	/* prologue: function */
+ 171               	/* frame size = 0 */
+ 172               	/* stack size = 0 */
+ 173               	.L__stack_usage = 0
+  38:LCD.c         **** 	CLR_RS;
+ 174               		.loc 1 38 2 view .LVU54
+ 175 005c C098      		cbi 0x18,0
+  39:LCD.c         **** 	lcd_write_byte(cmd);
+ 176               		.loc 1 39 2 view .LVU55
+ 177 005e 0C94 0000 		jmp lcd_write_byte
+ 178               	.LVL9:
+ 179               		.loc 1 39 2 is_stmt 0 view .LVU56
+ 180               		.cfi_endproc
+ 181               	.LFE12:
+ 183               	.global	lcd_write_data
+ 185               	lcd_write_data:
+ 186               	.LVL10:
+ 187               	.LFB13:
+  40:LCD.c         **** }
+  41:LCD.c         **** void lcd_write_data(uint8_t data)
+  42:LCD.c         **** {
+ 188               		.loc 1 42 1 is_stmt 1 view -0
+ 189               		.cfi_startproc
+ 190               	/* prologue: function */
+ 191               	/* frame size = 0 */
+ 192               	/* stack size = 0 */
+ 193               	.L__stack_usage = 0
+  43:LCD.c         **** 	SET_RS;
+ 194               		.loc 1 43 2 view .LVU58
+ 195 0062 C09A      		sbi 0x18,0
+  44:LCD.c         **** 	lcd_write_byte(data);
+ 196               		.loc 1 44 2 view .LVU59
+ 197 0064 0C94 0000 		jmp lcd_write_byte
+ 198               	.LVL11:
+ 199               		.loc 1 44 2 is_stmt 0 view .LVU60
+ 200               		.cfi_endproc
+ 201               	.LFE13:
+ 203               	.global	lcdinit
+ 205               	lcdinit:
+ 206               	.LFB14:
+  45:LCD.c         **** }
+  46:LCD.c         **** void lcdinit(void)
+  47:LCD.c         **** {
+ 207               		.loc 1 47 1 is_stmt 1 view -0
+ 208               		.cfi_startproc
+ 209               	/* prologue: function */
+ 210               	/* frame size = 0 */
+ 211               	/* stack size = 0 */
+ 212               	.L__stack_usage = 0
+  48:LCD.c         **** 	LCD_PORT_DDR |=(1<<LCD_RS); //ustawiamy kierunek czyli wyjscie
+ 213               		.loc 1 48 2 view .LVU62
+ 214               		.loc 1 48 15 is_stmt 0 view .LVU63
+ 215 0068 B89A      		sbi 0x17,0
+  49:LCD.c         **** 	LCD_PORT_DDR |=(1<<LCD_E);
+ 216               		.loc 1 49 2 is_stmt 1 view .LVU64
+ 217               		.loc 1 49 15 is_stmt 0 view .LVU65
+ 218 006a B99A      		sbi 0x17,1
+  50:LCD.c         **** 	LCD_PORT_DDR |=(1<<LCD_D4)|(1<<LCD_D5)|(1<<LCD_D6)|(1<<LCD_D7);
+ 219               		.loc 1 50 2 is_stmt 1 view .LVU66
+ 220               		.loc 1 50 15 is_stmt 0 view .LVU67
+ 221 006c 87B3      		in r24,0x17
+ 222 006e 8C63      		ori r24,lo8(60)
+ 223 0070 87BB      		out 0x17,r24
+  51:LCD.c         **** 	
+  52:LCD.c         **** 	CLR_RS; //zerowanie RS, E, pinów na porcie 
+ 224               		.loc 1 52 2 is_stmt 1 view .LVU68
+ 225 0072 C098      		cbi 0x18,0
+  53:LCD.c         **** 	CLR_E; //ustawiamy zero bo nie wiemy jaki jest początkowy stan 
+ 226               		.loc 1 53 2 view .LVU69
+ 227 0074 C198      		cbi 0x18,1
+  54:LCD.c         **** 	LCD_PORT=0x00;
+ 228               		.loc 1 54 2 view .LVU70
+ 229               		.loc 1 54 10 is_stmt 0 view .LVU71
+ 230 0076 18BA      		out 0x18,__zero_reg__
+  55:LCD.c         **** 	/////////////
+  56:LCD.c         **** 	_delay_ms(45);
+ 231               		.loc 1 56 2 is_stmt 1 view .LVU72
+ 232               	.LVL12:
+ 233               	.LBB38:
+ 234               	.LBI38:
+ 166:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 235               		.loc 2 166 1 view .LVU73
+ 236               	.LBB39:
+ 168:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 237               		.loc 2 168 2 view .LVU74
+ 172:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 238               		.loc 2 172 2 view .LVU75
+ 173:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 239               		.loc 2 173 2 view .LVU76
+ 174:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 240               		.loc 2 174 2 view .LVU77
+ 184:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 241               		.loc 2 184 3 view .LVU78
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 242               		.loc 2 187 2 view .LVU79
+ 243 0078 2FE7      		ldi r18,lo8(143999)
+ 244 007a 82E3      		ldi r24,hi8(143999)
+ 245 007c 92E0      		ldi r25,hlo8(143999)
+ 246 007e 2150      	1:	subi r18,1
+ 247 0080 8040      		sbci r24,0
+ 248 0082 9040      		sbci r25,0
+ 249 0084 01F4      		brne 1b
+ 250 0086 00C0      		rjmp .
+ 251 0088 0000      		nop
+ 252               	.LVL13:
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 253               		.loc 2 187 2 is_stmt 0 view .LVU80
+ 254               	.LBE39:
+ 255               	.LBE38:
+  57:LCD.c         **** 	lcd_send_half_byte(3); //albo lcd_send_half_byte((1<<0)|(1<<1))
+ 256               		.loc 1 57 2 is_stmt 1 view .LVU81
+ 257 008a 83E0      		ldi r24,lo8(3)
+ 258 008c 0E94 0000 		call lcd_send_half_byte
+ 259               	.LVL14:
+  58:LCD.c         **** 	_delay_ms(4.1);
+ 260               		.loc 1 58 2 view .LVU82
+ 261               	.LBB40:
+ 262               	.LBI40:
+ 166:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 263               		.loc 2 166 1 view .LVU83
+ 264               	.LBB41:
+ 168:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 265               		.loc 2 168 2 view .LVU84
+ 172:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 266               		.loc 2 172 2 view .LVU85
+ 173:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 267               		.loc 2 173 2 view .LVU86
+ 174:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 268               		.loc 2 174 2 view .LVU87
+ 184:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 269               		.loc 2 184 3 view .LVU88
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 270               		.loc 2 187 2 view .LVU89
+ 271 0090 8FE0      		ldi r24,lo8(16399)
+ 272 0092 90E4      		ldi r25,hi8(16399)
+ 273 0094 0197      	1:	sbiw r24,1
+ 274 0096 01F4      		brne 1b
+ 275 0098 00C0      		rjmp .
+ 276 009a 0000      		nop
+ 277               	.LVL15:
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 278               		.loc 2 187 2 is_stmt 0 view .LVU90
+ 279               	.LBE41:
+ 280               	.LBE40:
+  59:LCD.c         **** 	lcd_send_half_byte(3);
+ 281               		.loc 1 59 2 is_stmt 1 view .LVU91
+ 282 009c 83E0      		ldi r24,lo8(3)
+ 283 009e 0E94 0000 		call lcd_send_half_byte
+ 284               	.LVL16:
+  60:LCD.c         **** 	_delay_us(100);
+ 285               		.loc 1 60 2 view .LVU92
+ 286               	.LBB42:
+ 287               	.LBI42:
+ 255:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 288               		.loc 2 255 1 view .LVU93
+ 289               	.LBB43:
+ 257:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 290               		.loc 2 257 2 view .LVU94
+ 261:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 291               		.loc 2 261 2 view .LVU95
+ 262:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e6) * __us;
+ 292               		.loc 2 262 2 view .LVU96
+ 263:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 293               		.loc 2 263 2 view .LVU97
+ 273:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 294               		.loc 2 273 3 view .LVU98
+ 295               		.loc 2 276 2 view .LVU99
+ 296 00a2 8FE8      		ldi r24,lo8(399)
+ 297 00a4 91E0      		ldi r25,hi8(399)
+ 298 00a6 0197      	1:	sbiw r24,1
+ 299 00a8 01F4      		brne 1b
+ 300 00aa 00C0      		rjmp .
+ 301 00ac 0000      		nop
+ 302               	.LVL17:
+ 303               		.loc 2 276 2 is_stmt 0 view .LVU100
+ 304               	.LBE43:
+ 305               	.LBE42:
+  61:LCD.c         **** 	lcd_send_half_byte(3);
+ 306               		.loc 1 61 2 is_stmt 1 view .LVU101
+ 307 00ae 83E0      		ldi r24,lo8(3)
+ 308 00b0 0E94 0000 		call lcd_send_half_byte
+ 309               	.LVL18:
+  62:LCD.c         **** 	_delay_us(100);
+ 310               		.loc 1 62 2 view .LVU102
+ 311               	.LBB44:
+ 312               	.LBI44:
+ 255:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 313               		.loc 2 255 1 view .LVU103
+ 314               	.LBB45:
+ 257:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 315               		.loc 2 257 2 view .LVU104
+ 261:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 316               		.loc 2 261 2 view .LVU105
+ 262:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e6) * __us;
+ 317               		.loc 2 262 2 view .LVU106
+ 263:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 318               		.loc 2 263 2 view .LVU107
+ 273:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 319               		.loc 2 273 3 view .LVU108
+ 320               		.loc 2 276 2 view .LVU109
+ 321 00b4 8FE8      		ldi r24,lo8(399)
+ 322 00b6 91E0      		ldi r25,hi8(399)
+ 323 00b8 0197      	1:	sbiw r24,1
+ 324 00ba 01F4      		brne 1b
+ 325 00bc 00C0      		rjmp .
+ 326 00be 0000      		nop
+ 327               	.LVL19:
+ 328               		.loc 2 276 2 is_stmt 0 view .LVU110
+ 329               	.LBE45:
+ 330               	.LBE44:
+  63:LCD.c         **** 	
+  64:LCD.c         **** 	lcd_send_half_byte((1<<1));
+ 331               		.loc 1 64 2 is_stmt 1 view .LVU111
+ 332 00c0 82E0      		ldi r24,lo8(2)
+ 333 00c2 0E94 0000 		call lcd_send_half_byte
+ 334               	.LVL20:
+  65:LCD.c         **** 	_delay_ms(3);
+ 335               		.loc 1 65 2 view .LVU112
+ 336               	.LBB46:
+ 337               	.LBI46:
+ 166:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 338               		.loc 2 166 1 view .LVU113
+ 339               	.LBB47:
+ 168:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 340               		.loc 2 168 2 view .LVU114
+ 172:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 341               		.loc 2 172 2 view .LVU115
+ 173:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 342               		.loc 2 173 2 view .LVU116
+ 174:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 343               		.loc 2 174 2 view .LVU117
+ 184:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 344               		.loc 2 184 3 view .LVU118
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 345               		.loc 2 187 2 view .LVU119
+ 346 00c6 8FED      		ldi r24,lo8(11999)
+ 347 00c8 9EE2      		ldi r25,hi8(11999)
+ 348 00ca 0197      	1:	sbiw r24,1
+ 349 00cc 01F4      		brne 1b
+ 350 00ce 00C0      		rjmp .
+ 351 00d0 0000      		nop
+ 352               	.LVL21:
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 353               		.loc 2 187 2 is_stmt 0 view .LVU120
+ 354               	.LBE47:
+ 355               	.LBE46:
+  66:LCD.c         **** 	
+  67:LCD.c         **** 	lcd_write_cmd((1<<3)|(1<<5)); //Function set
+ 356               		.loc 1 67 2 is_stmt 1 view .LVU121
+ 357 00d2 88E2      		ldi r24,lo8(40)
+ 358 00d4 0E94 0000 		call lcd_write_cmd
+ 359               	.LVL22:
+  68:LCD.c         **** 	_delay_ms(3);
+ 360               		.loc 1 68 2 view .LVU122
+ 361               	.LBB48:
+ 362               	.LBI48:
+ 166:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 363               		.loc 2 166 1 view .LVU123
+ 364               	.LBB49:
+ 168:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 365               		.loc 2 168 2 view .LVU124
+ 172:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 366               		.loc 2 172 2 view .LVU125
+ 173:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 367               		.loc 2 173 2 view .LVU126
+ 174:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 368               		.loc 2 174 2 view .LVU127
+ 184:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 369               		.loc 2 184 3 view .LVU128
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 370               		.loc 2 187 2 view .LVU129
+ 371 00d8 8FED      		ldi r24,lo8(11999)
+ 372 00da 9EE2      		ldi r25,hi8(11999)
+ 373 00dc 0197      	1:	sbiw r24,1
+ 374 00de 01F4      		brne 1b
+ 375 00e0 00C0      		rjmp .
+ 376 00e2 0000      		nop
+ 377               	.LVL23:
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 378               		.loc 2 187 2 is_stmt 0 view .LVU130
+ 379               	.LBE49:
+ 380               	.LBE48:
+  69:LCD.c         **** 	
+  70:LCD.c         **** 	lcd_write_cmd((1<<3)); //Display off
+ 381               		.loc 1 70 2 is_stmt 1 view .LVU131
+ 382 00e4 88E0      		ldi r24,lo8(8)
+ 383 00e6 0E94 0000 		call lcd_write_cmd
+ 384               	.LVL24:
+  71:LCD.c         **** 	_delay_ms(3);
+ 385               		.loc 1 71 2 view .LVU132
+ 386               	.LBB50:
+ 387               	.LBI50:
+ 166:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 388               		.loc 2 166 1 view .LVU133
+ 389               	.LBB51:
+ 168:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 390               		.loc 2 168 2 view .LVU134
+ 172:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 391               		.loc 2 172 2 view .LVU135
+ 173:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 392               		.loc 2 173 2 view .LVU136
+ 174:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 393               		.loc 2 174 2 view .LVU137
+ 184:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 394               		.loc 2 184 3 view .LVU138
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 395               		.loc 2 187 2 view .LVU139
+ 396 00ea 8FED      		ldi r24,lo8(11999)
+ 397 00ec 9EE2      		ldi r25,hi8(11999)
+ 398 00ee 0197      	1:	sbiw r24,1
+ 399 00f0 01F4      		brne 1b
+ 400 00f2 00C0      		rjmp .
+ 401 00f4 0000      		nop
+ 402               	.LVL25:
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 403               		.loc 2 187 2 is_stmt 0 view .LVU140
+ 404               	.LBE51:
+ 405               	.LBE50:
+  72:LCD.c         **** 	
+  73:LCD.c         **** 	lcd_write_cmd((1<<0)); //Display clear
+ 406               		.loc 1 73 2 is_stmt 1 view .LVU141
+ 407 00f6 81E0      		ldi r24,lo8(1)
+ 408 00f8 0E94 0000 		call lcd_write_cmd
+ 409               	.LVL26:
+  74:LCD.c         **** 	_delay_ms(3);
+ 410               		.loc 1 74 2 view .LVU142
+ 411               	.LBB52:
+ 412               	.LBI52:
+ 166:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 413               		.loc 2 166 1 view .LVU143
+ 414               	.LBB53:
+ 168:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 415               		.loc 2 168 2 view .LVU144
+ 172:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 416               		.loc 2 172 2 view .LVU145
+ 173:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 417               		.loc 2 173 2 view .LVU146
+ 174:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 418               		.loc 2 174 2 view .LVU147
+ 184:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 419               		.loc 2 184 3 view .LVU148
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 420               		.loc 2 187 2 view .LVU149
+ 421 00fc 8FED      		ldi r24,lo8(11999)
+ 422 00fe 9EE2      		ldi r25,hi8(11999)
+ 423 0100 0197      	1:	sbiw r24,1
+ 424 0102 01F4      		brne 1b
+ 425 0104 00C0      		rjmp .
+ 426 0106 0000      		nop
+ 427               	.LVL27:
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 428               		.loc 2 187 2 is_stmt 0 view .LVU150
+ 429               	.LBE53:
+ 430               	.LBE52:
+  75:LCD.c         **** 	
+  76:LCD.c         **** 	lcd_write_cmd((1<<2)|(1<<1)); //Entry mode set
+ 431               		.loc 1 76 2 is_stmt 1 view .LVU151
+ 432 0108 86E0      		ldi r24,lo8(6)
+ 433 010a 0E94 0000 		call lcd_write_cmd
+ 434               	.LVL28:
+  77:LCD.c         **** 	_delay_ms(3);
+ 435               		.loc 1 77 2 view .LVU152
+ 436               	.LBB54:
+ 437               	.LBI54:
+ 166:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 438               		.loc 2 166 1 view .LVU153
+ 439               	.LBB55:
+ 168:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 440               		.loc 2 168 2 view .LVU154
+ 172:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 441               		.loc 2 172 2 view .LVU155
+ 173:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 442               		.loc 2 173 2 view .LVU156
+ 174:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 443               		.loc 2 174 2 view .LVU157
+ 184:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 444               		.loc 2 184 3 view .LVU158
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 445               		.loc 2 187 2 view .LVU159
+ 446 010e 8FED      		ldi r24,lo8(11999)
+ 447 0110 9EE2      		ldi r25,hi8(11999)
+ 448 0112 0197      	1:	sbiw r24,1
+ 449 0114 01F4      		brne 1b
+ 450 0116 00C0      		rjmp .
+ 451 0118 0000      		nop
+ 452               	.LVL29:
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 453               		.loc 2 187 2 is_stmt 0 view .LVU160
+ 454               	.LBE55:
+ 455               	.LBE54:
+  78:LCD.c         **** 	
+  79:LCD.c         **** 	lcd_write_cmd(0x0F);//lcd_write_cmd((1<<1)|(1<<2)|(1<<3)); // set display display on cursor on 
+ 456               		.loc 1 79 2 is_stmt 1 view .LVU161
+ 457 011a 8FE0      		ldi r24,lo8(15)
+ 458 011c 0E94 0000 		call lcd_write_cmd
+ 459               	.LVL30:
+  80:LCD.c         **** 	_delay_ms(3);
+ 460               		.loc 1 80 2 view .LVU162
+ 461               	.LBB56:
+ 462               	.LBI56:
+ 166:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 463               		.loc 2 166 1 view .LVU163
+ 464               	.LBB57:
+ 168:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 465               		.loc 2 168 2 view .LVU164
+ 172:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 466               		.loc 2 172 2 view .LVU165
+ 173:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 467               		.loc 2 173 2 view .LVU166
+ 174:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 468               		.loc 2 174 2 view .LVU167
+ 184:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 469               		.loc 2 184 3 view .LVU168
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 470               		.loc 2 187 2 view .LVU169
+ 471 0120 8FED      		ldi r24,lo8(11999)
+ 472 0122 9EE2      		ldi r25,hi8(11999)
+ 473 0124 0197      	1:	sbiw r24,1
+ 474 0126 01F4      		brne 1b
+ 475 0128 00C0      		rjmp .
+ 476 012a 0000      		nop
+ 477               	.LVL31:
+ 478               	/* epilogue start */
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 479               		.loc 2 187 2 is_stmt 0 view .LVU170
+ 480               	.LBE57:
+ 481               	.LBE56:
+  81:LCD.c         **** }
+ 482               		.loc 1 81 1 view .LVU171
+ 483 012c 0895      		ret
+ 484               		.cfi_endproc
+ 485               	.LFE14:
+ 487               	.global	lcd_clr
+ 489               	lcd_clr:
+ 490               	.LFB15:
+  82:LCD.c         **** void lcd_clr(void) //czyszczonko ekranu 
+  83:LCD.c         **** {
+ 491               		.loc 1 83 1 is_stmt 1 view -0
+ 492               		.cfi_startproc
+ 493               	/* prologue: function */
+ 494               	/* frame size = 0 */
+ 495               	/* stack size = 0 */
+ 496               	.L__stack_usage = 0
+  84:LCD.c         **** 	lcd_write_cmd((1<<0));
+ 497               		.loc 1 84 2 view .LVU173
+ 498 012e 81E0      		ldi r24,lo8(1)
+ 499 0130 0E94 0000 		call lcd_write_cmd
+ 500               	.LVL32:
+  85:LCD.c         **** 	_delay_ms(5);
+ 501               		.loc 1 85 2 view .LVU174
+ 502               	.LBB58:
+ 503               	.LBI58:
+ 166:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 504               		.loc 2 166 1 view .LVU175
+ 505               	.LBB59:
+ 168:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 506               		.loc 2 168 2 view .LVU176
+ 172:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 507               		.loc 2 172 2 view .LVU177
+ 173:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 508               		.loc 2 173 2 view .LVU178
+ 174:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 509               		.loc 2 174 2 view .LVU179
+ 184:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 510               		.loc 2 184 3 view .LVU180
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 511               		.loc 2 187 2 view .LVU181
+ 512 0134 8FE1      		ldi r24,lo8(19999)
+ 513 0136 9EE4      		ldi r25,hi8(19999)
+ 514 0138 0197      	1:	sbiw r24,1
+ 515 013a 01F4      		brne 1b
+ 516 013c 00C0      		rjmp .
+ 517 013e 0000      		nop
+ 518               	.LVL33:
+ 519               	/* epilogue start */
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 520               		.loc 2 187 2 is_stmt 0 view .LVU182
+ 521               	.LBE59:
+ 522               	.LBE58:
+  86:LCD.c         **** }
+ 523               		.loc 1 86 1 view .LVU183
+ 524 0140 0895      		ret
+ 525               		.cfi_endproc
+ 526               	.LFE15:
+ 528               	.global	lcd_cursor_return
+ 530               	lcd_cursor_return:
+ 531               	.LFB16:
+  87:LCD.c         **** void lcd_cursor_return(void)
+  88:LCD.c         **** {
+ 532               		.loc 1 88 1 is_stmt 1 view -0
+ 533               		.cfi_startproc
+ 534               	/* prologue: function */
+ 535               	/* frame size = 0 */
+ 536               	/* stack size = 0 */
+ 537               	.L__stack_usage = 0
+  89:LCD.c         **** 	lcd_write_cmd((1<<1));
+ 538               		.loc 1 89 2 view .LVU185
+ 539 0142 82E0      		ldi r24,lo8(2)
+ 540 0144 0E94 0000 		call lcd_write_cmd
+ 541               	.LVL34:
+  90:LCD.c         **** 	_delay_ms(5);
+ 542               		.loc 1 90 2 view .LVU186
+ 543               	.LBB60:
+ 544               	.LBI60:
+ 166:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** {
+ 545               		.loc 2 166 1 view .LVU187
+ 546               	.LBB61:
+ 168:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 547               		.loc 2 168 2 view .LVU188
+ 172:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 548               		.loc 2 172 2 view .LVU189
+ 173:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 549               		.loc 2 173 2 view .LVU190
+ 174:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 550               		.loc 2 174 2 view .LVU191
+ 184:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 	#endif
+ 551               		.loc 2 184 3 view .LVU192
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 552               		.loc 2 187 2 view .LVU193
+ 553 0148 8FE1      		ldi r24,lo8(19999)
+ 554 014a 9EE4      		ldi r25,hi8(19999)
+ 555 014c 0197      	1:	sbiw r24,1
+ 556 014e 01F4      		brne 1b
+ 557 0150 00C0      		rjmp .
+ 558 0152 0000      		nop
+ 559               	.LVL35:
+ 560               	/* epilogue start */
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\util\delay.h **** 
+ 561               		.loc 2 187 2 is_stmt 0 view .LVU194
+ 562               	.LBE61:
+ 563               	.LBE60:
+  91:LCD.c         **** }
+ 564               		.loc 1 91 1 view .LVU195
+ 565 0154 0895      		ret
+ 566               		.cfi_endproc
+ 567               	.LFE16:
+ 569               	.global	lcd_text
+ 571               	lcd_text:
+ 572               	.LVL36:
+ 573               	.LFB17:
+  92:LCD.c         **** void lcd_text(char *str)
+  93:LCD.c         **** {
+ 574               		.loc 1 93 1 is_stmt 1 view -0
+ 575               		.cfi_startproc
+ 576               		.loc 1 93 1 is_stmt 0 view .LVU197
+ 577 0156 CF93      		push r28
+ 578               	.LCFI1:
+ 579               		.cfi_def_cfa_offset 3
+ 580               		.cfi_offset 28, -2
+ 581 0158 DF93      		push r29
+ 582               	.LCFI2:
+ 583               		.cfi_def_cfa_offset 4
+ 584               		.cfi_offset 29, -3
+ 585               	/* prologue: function */
+ 586               	/* frame size = 0 */
+ 587               	/* stack size = 2 */
+ 588               	.L__stack_usage = 2
+ 589 015a EC01      		movw r28,r24
+  94:LCD.c         **** 	while (*str) lcd_write_data(*str++);
+ 590               		.loc 1 94 2 is_stmt 1 view .LVU198
+ 591               	.LVL37:
+ 592               	.L17:
+ 593               		.loc 1 94 8 discriminator 1 view .LVU199
+ 594               		.loc 1 94 9 is_stmt 0 discriminator 1 view .LVU200
+ 595 015c 8991      		ld r24,Y+
+ 596               	.LVL38:
+ 597               		.loc 1 94 8 discriminator 1 view .LVU201
+ 598 015e 8111      		cpse r24,__zero_reg__
+ 599 0160 00C0      		rjmp .L18
+ 600               	/* epilogue start */
+  95:LCD.c         **** }
+ 601               		.loc 1 95 1 view .LVU202
+ 602 0162 DF91      		pop r29
+ 603 0164 CF91      		pop r28
+ 604               	.LVL39:
+ 605               		.loc 1 95 1 view .LVU203
+ 606 0166 0895      		ret
+ 607               	.LVL40:
+ 608               	.L18:
+  94:LCD.c         **** 	while (*str) lcd_write_data(*str++);
+ 609               		.loc 1 94 15 is_stmt 1 discriminator 2 view .LVU204
+  94:LCD.c         **** 	while (*str) lcd_write_data(*str++);
+ 610               		.loc 1 94 15 is_stmt 0 discriminator 2 view .LVU205
+ 611 0168 0E94 0000 		call lcd_write_data
+ 612               	.LVL41:
+ 613 016c 00C0      		rjmp .L17
+ 614               		.cfi_endproc
+ 615               	.LFE17:
+ 617               	.global	lcd_int
+ 619               	lcd_int:
+ 620               	.LVL42:
+ 621               	.LFB18:
+  96:LCD.c         **** void lcd_int(int16_t z) //wyswietla wartosc jako zmienna
+  97:LCD.c         **** {
+ 622               		.loc 1 97 1 is_stmt 1 view -0
+ 623               		.cfi_startproc
+ 624               		.loc 1 97 1 is_stmt 0 view .LVU207
+ 625 016e CF93      		push r28
+ 626               	.LCFI3:
+ 627               		.cfi_def_cfa_offset 3
+ 628               		.cfi_offset 28, -2
+ 629 0170 DF93      		push r29
+ 630               	.LCFI4:
+ 631               		.cfi_def_cfa_offset 4
+ 632               		.cfi_offset 29, -3
+ 633 0172 CDB7      		in r28,__SP_L__
+ 634 0174 DEB7      		in r29,__SP_H__
+ 635               	.LCFI5:
+ 636               		.cfi_def_cfa_register 28
+ 637 0176 2A97      		sbiw r28,10
+ 638               	.LCFI6:
+ 639               		.cfi_def_cfa_offset 14
+ 640 0178 0FB6      		in __tmp_reg__,__SREG__
+ 641 017a F894      		cli
+ 642 017c DEBF      		out __SP_H__,r29
+ 643 017e 0FBE      		out __SREG__,__tmp_reg__
+ 644 0180 CDBF      		out __SP_L__,r28
+ 645               	/* prologue: function */
+ 646               	/* frame size = 10 */
+ 647               	/* stack size = 12 */
+ 648               	.L__stack_usage = 12
+  98:LCD.c         **** 	char buf[10];
+ 649               		.loc 1 98 2 is_stmt 1 view .LVU208
+  99:LCD.c         **** 	lcd_text(itoa(z,buf,10));
+ 650               		.loc 1 99 2 view .LVU209
+ 651               	.LVL43:
+ 652               	.LBB62:
+ 653               	.LBI62:
+ 654               		.file 3 "c:\\avr-gcc-10.1.0-x64-windows\\avr\\include\\stdlib.h"
+   1:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /* Copyright (c) 2002, Marek Michalkiewicz
+   2:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    Copyright (c) 2004,2007 Joerg Wunsch
+   3:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+   4:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    Portions of documentation Copyright (c) 1990, 1991, 1993, 1994
+   5:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    The Regents of the University of California.
+   6:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+   7:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    All rights reserved.
+   8:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+   9:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    Redistribution and use in source and binary forms, with or without
+  10:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    modification, are permitted provided that the following conditions are met:
+  11:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  12:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    * Redistributions of source code must retain the above copyright
+  13:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      notice, this list of conditions and the following disclaimer.
+  14:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  15:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    * Redistributions in binary form must reproduce the above copyright
+  16:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      notice, this list of conditions and the following disclaimer in
+  17:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      the documentation and/or other materials provided with the
+  18:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      distribution.
+  19:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  20:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    * Neither the name of the copyright holders nor the names of
+  21:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      contributors may be used to endorse or promote products derived
+  22:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      from this software without specific prior written permission.
+  23:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  24:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  25:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  26:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  27:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  28:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  29:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  30:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  31:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  32:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  33:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  34:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****   POSSIBILITY OF SUCH DAMAGE.
+  35:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  36:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****   $Id$
+  37:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+  38:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  39:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifndef _STDLIB_H_
+  40:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #define	_STDLIB_H_ 1
+  41:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  42:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifndef __ASSEMBLER__
+  43:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  44:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifndef __DOXYGEN__
+  45:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #define __need_NULL
+  46:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #define __need_size_t
+  47:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #define __need_wchar_t
+  48:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #include <stddef.h>
+  49:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  50:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifndef __ptr_t
+  51:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #define __ptr_t void *
+  52:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #endif
+  53:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #endif	/* !__DOXYGEN__ */
+  54:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  55:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifdef __cplusplus
+  56:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern "C" {
+  57:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #endif
+  58:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  59:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /** \file */
+  60:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  61:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /** \defgroup avr_stdlib <stdlib.h>: General utilities
+  62:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     \code #include <stdlib.h> \endcode
+  63:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  64:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     This file declares some basic C macros and functions as
+  65:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     defined by the ISO standard, plus some AVR-specific extensions.
+  66:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+  67:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  68:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /*@{*/
+  69:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /** Result type for function div(). */
+  70:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** typedef struct {
+  71:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 	int quot;                   /**< The Quotient. */
+  72:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 	int rem;                    /**< The Remainder. */
+  73:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** } div_t;
+  74:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  75:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /** Result type for function ldiv(). */
+  76:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** typedef struct {
+  77:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 	long quot;                  /**< The Quotient. */
+  78:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 	long rem;                   /**< The Remainder. */
+  79:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** } ldiv_t;
+  80:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  81:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /** Comparision function type for qsort(), just for convenience. */
+  82:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** typedef int (*__compar_fn_t)(const void *, const void *);
+  83:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  84:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifndef __DOXYGEN__
+  85:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  86:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifndef __ATTR_CONST__
+  87:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** # define __ATTR_CONST__ __attribute__((__const__))
+  88:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #endif
+  89:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  90:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifndef __ATTR_MALLOC__
+  91:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** # define __ATTR_MALLOC__ __attribute__((__malloc__))
+  92:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #endif
+  93:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  94:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifndef __ATTR_NORETURN__
+  95:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** # define __ATTR_NORETURN__ __attribute__((__noreturn__))
+  96:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #endif
+  97:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+  98:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifndef __ATTR_PURE__
+  99:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** # define __ATTR_PURE__ __attribute__((__pure__))
+ 100:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #endif
+ 101:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 102:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifndef	__ATTR_GNU_INLINE__
+ 103:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** # ifdef  __GNUC_STDC_INLINE__
+ 104:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #  define __ATTR_GNU_INLINE__   __attribute__((__gnu_inline__))
+ 105:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** # else
+ 106:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #  define __ATTR_GNU_INLINE__
+ 107:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** # endif
+ 108:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #endif
+ 109:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 110:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #endif
+ 111:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 112:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /** The abort() function causes abnormal program termination to occur.
+ 113:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     This realization disables interrupts and jumps to _exit() function
+ 114:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     with argument equal to 1. In the limited AVR environment, execution is
+ 115:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     effectively halted by entering an infinite loop. */
+ 116:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern void abort(void) __ATTR_NORETURN__;
+ 117:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 118:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /** The abs() function computes the absolute value of the integer \c i.
+ 119:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    \note The abs() and labs() functions are builtins of gcc.
+ 120:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 121:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern int abs(int __i) __ATTR_CONST__;
+ 122:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifndef __DOXYGEN__
+ 123:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #define	abs(__i) __builtin_abs(__i)
+ 124:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #endif
+ 125:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 126:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /** The labs() function computes the absolute value of the long integer
+ 127:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     \c i.
+ 128:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    \note The abs() and labs() functions are builtins of gcc.
+ 129:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 130:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern long labs(long __i) __ATTR_CONST__;
+ 131:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifndef __DOXYGEN__
+ 132:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #define labs(__i) __builtin_labs(__i)
+ 133:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #endif
+ 134:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 135:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 136:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      The bsearch() function searches an array of \c nmemb objects, the
+ 137:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      initial member of which is pointed to by \c base, for a member
+ 138:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      that matches the object pointed to by \c key.  The size of each
+ 139:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      member of the array is specified by \c size.
+ 140:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 141:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      The contents of the array should be in ascending sorted order
+ 142:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      according to the comparison function referenced by \c compar.
+ 143:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      The \c compar routine is expected to have two arguments which
+ 144:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      point to the key object and to an array member, in that order,
+ 145:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      and should return an integer less than, equal to, or greater than
+ 146:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      zero if the key object is found, respectively, to be less than,
+ 147:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      to match, or be greater than the array member.
+ 148:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 149:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      The bsearch() function returns a pointer to a matching member of
+ 150:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      the array, or a null pointer if no match is found.  If two
+ 151:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      members compare as equal, which member is matched is unspecified.
+ 152:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 153:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern void *bsearch(const void *__key, const void *__base, size_t __nmemb,
+ 154:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 		     size_t __size, int (*__compar)(const void *, const void *));
+ 155:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 156:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /* __divmodhi4 and __divmodsi4 from libgcc.a */
+ 157:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 158:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      The div() function computes the value \c num/denom and returns
+ 159:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      the quotient and remainder in a structure named \c div_t that
+ 160:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      contains two int members named \c quot and \c rem.
+ 161:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 162:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern div_t div(int __num, int __denom) __asm__("__divmodhi4") __ATTR_CONST__;
+ 163:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 164:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      The ldiv() function computes the value \c num/denom and returns
+ 165:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      the quotient and remainder in a structure named \c ldiv_t that
+ 166:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      contains two long integer members named \c quot and \c rem.
+ 167:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 168:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern ldiv_t ldiv(long __num, long __denom) __asm__("__divmodsi4") __ATTR_CONST__;
+ 169:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 170:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 171:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      The qsort() function is a modified partition-exchange sort, or
+ 172:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      quicksort.
+ 173:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 174:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      The qsort() function sorts an array of \c nmemb objects, the
+ 175:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      initial member of which is pointed to by \c base.  The size of
+ 176:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      each object is specified by \c size.  The contents of the array
+ 177:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      base are sorted in ascending order according to a comparison
+ 178:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      function pointed to by \c compar, which requires two arguments
+ 179:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      pointing to the objects being compared.
+ 180:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 181:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      The comparison function must return an integer less than, equal
+ 182:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      to, or greater than zero if the first argument is considered to
+ 183:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      be respectively less than, equal to, or greater than the second.
+ 184:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 185:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern void qsort(void *__base, size_t __nmemb, size_t __size,
+ 186:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 		  __compar_fn_t __compar);
+ 187:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 188:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 189:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     The strtol() function converts the string in \c nptr to a long
+ 190:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     value.  The conversion is done according to the given base, which
+ 191:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     must be between 2 and 36 inclusive, or be the special value 0.
+ 192:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 193:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     The string may begin with an arbitrary amount of white space (as
+ 194:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     determined by isspace()) followed by a single optional \c '+' or \c '-'
+ 195:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     sign.  If \c base is zero or 16, the string may then include a
+ 196:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     \c "0x" prefix, and the number will be read in base 16; otherwise,
+ 197:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     a zero base is taken as 10 (decimal) unless the next character is
+ 198:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     \c '0', in which case it is taken as 8 (octal).
+ 199:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 200:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     The remainder of the string is converted to a long value in the
+ 201:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     obvious manner, stopping at the first character which is not a
+ 202:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     valid digit in the given base.  (In bases above 10, the letter \c 'A'
+ 203:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     in either upper or lower case represents 10, \c 'B' represents 11,
+ 204:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     and so forth, with \c 'Z' representing 35.)
+ 205:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 206:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     If \c endptr is not NULL, strtol() stores the address of the first
+ 207:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     invalid character in \c *endptr.  If there were no digits at all,
+ 208:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     however, strtol() stores the original value of \c nptr in \c
+ 209:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     *endptr.  (Thus, if \c *nptr is not \c '\\0' but \c **endptr is \c '\\0'
+ 210:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     on return, the entire string was valid.)
+ 211:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 212:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     The strtol() function returns the result of the conversion, unless
+ 213:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     the value would underflow or overflow.  If no conversion could be
+ 214:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     performed, 0 is returned.  If an overflow or underflow occurs, \c
+ 215:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     errno is set to \ref avr_errno "ERANGE" and the function return value
+ 216:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     is clamped to \c LONG_MIN or \c LONG_MAX, respectively.
+ 217:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 218:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern long strtol(const char *__nptr, char **__endptr, int __base);
+ 219:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 220:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 221:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     The strtoul() function converts the string in \c nptr to an
+ 222:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     unsigned long value.  The conversion is done according to the
+ 223:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     given base, which must be between 2 and 36 inclusive, or be the
+ 224:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     special value 0.
+ 225:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 226:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     The string may begin with an arbitrary amount of white space (as
+ 227:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     determined by isspace()) followed by a single optional \c '+' or \c '-'
+ 228:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     sign.  If \c base is zero or 16, the string may then include a
+ 229:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     \c "0x" prefix, and the number will be read in base 16; otherwise,
+ 230:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     a zero base is taken as 10 (decimal) unless the next character is
+ 231:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     \c '0', in which case it is taken as 8 (octal).
+ 232:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 233:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     The remainder of the string is converted to an unsigned long value
+ 234:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     in the obvious manner, stopping at the first character which is
+ 235:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     not a valid digit in the given base.  (In bases above 10, the
+ 236:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     letter \c 'A' in either upper or lower case represents 10, \c 'B'
+ 237:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     represents 11, and so forth, with \c 'Z' representing 35.)
+ 238:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 239:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     If \c endptr is not NULL, strtoul() stores the address of the first
+ 240:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     invalid character in \c *endptr.  If there were no digits at all,
+ 241:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     however, strtoul() stores the original value of \c nptr in \c
+ 242:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     *endptr.  (Thus, if \c *nptr is not \c '\\0' but \c **endptr is \c '\\0'
+ 243:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     on return, the entire string was valid.)
+ 244:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 245:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     The strtoul() function return either the result of the conversion
+ 246:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     or, if there was a leading minus sign, the negation of the result
+ 247:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     of the conversion, unless the original (non-negated) value would
+ 248:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     overflow; in the latter case, strtoul() returns ULONG_MAX, and \c
+ 249:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     errno is set to \ref avr_errno "ERANGE".  If no conversion could 
+ 250:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     be performed, 0 is returned.
+ 251:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 252:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern unsigned long strtoul(const char *__nptr, char **__endptr, int __base);
+ 253:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 254:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 255:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     The atol() function converts the initial portion of the string
+ 256:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     pointed to by \p s to long integer representation. In contrast to
+ 257:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 258:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****         \code strtol(s, (char **)NULL, 10); \endcode
+ 259:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 260:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     this function does not detect overflow (\c errno is not changed and
+ 261:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     the result value is not predictable), uses smaller memory (flash and
+ 262:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     stack) and works more quickly.
+ 263:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 264:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern long atol(const char *__s) __ATTR_PURE__;
+ 265:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 266:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 267:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     The atoi() function converts the initial portion of the string
+ 268:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     pointed to by \p s to integer representation. In contrast to
+ 269:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 270:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****         \code (int)strtol(s, (char **)NULL, 10); \endcode
+ 271:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 272:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     this function does not detect overflow (\c errno is not changed and
+ 273:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     the result value is not predictable), uses smaller memory (flash and
+ 274:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     stack) and works more quickly.
+ 275:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 276:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern int atoi(const char *__s) __ATTR_PURE__;
+ 277:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 278:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 279:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    The exit() function terminates the application.  Since there is no
+ 280:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    environment to return to, \c status is ignored, and code execution
+ 281:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    will eventually reach an infinite loop, thereby effectively halting
+ 282:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    all code processing.  Before entering the infinite loop, interrupts
+ 283:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    are globally disabled.
+ 284:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 285:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    In a C++ context, global destructors will be called before halting
+ 286:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    execution.
+ 287:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 288:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern void exit(int __status) __ATTR_NORETURN__;
+ 289:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 290:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 291:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    The malloc() function allocates \c size bytes of memory.
+ 292:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    If malloc() fails, a NULL pointer is returned.
+ 293:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 294:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    Note that malloc() does \e not initialize the returned memory to
+ 295:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    zero bytes.
+ 296:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 297:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    See the chapter about \ref malloc "malloc() usage" for implementation
+ 298:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    details.
+ 299:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 300:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern void *malloc(size_t __size) __ATTR_MALLOC__;
+ 301:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 302:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 303:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    The free() function causes the allocated memory referenced by \c
+ 304:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    ptr to be made available for future allocations.  If \c ptr is
+ 305:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    NULL, no action occurs.
+ 306:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 307:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern void free(void *__ptr);
+ 308:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 309:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 310:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    \c malloc() \ref malloc_tunables "tunable".
+ 311:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 312:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern size_t __malloc_margin;
+ 313:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 314:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 315:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    \c malloc() \ref malloc_tunables "tunable".
+ 316:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 317:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern char *__malloc_heap_start;
+ 318:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 319:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 320:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    \c malloc() \ref malloc_tunables "tunable".
+ 321:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 322:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern char *__malloc_heap_end;
+ 323:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 324:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 325:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    Allocate \c nele elements of \c size each.  Identical to calling
+ 326:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    \c malloc() using <tt>nele * size</tt> as argument, except the
+ 327:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    allocated memory will be cleared to zero.
+ 328:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 329:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern void *calloc(size_t __nele, size_t __size) __ATTR_MALLOC__;
+ 330:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 331:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 332:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    The realloc() function tries to change the size of the region
+ 333:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    allocated at \c ptr to the new \c size value.  It returns a
+ 334:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    pointer to the new region.  The returned pointer might be the
+ 335:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    same as the old pointer, or a pointer to a completely different
+ 336:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    region.
+ 337:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 338:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    The contents of the returned region up to either the old or the new
+ 339:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    size value (whatever is less) will be identical to the contents of
+ 340:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    the old region, even in case a new region had to be allocated.
+ 341:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 342:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    It is acceptable to pass \c ptr as NULL, in which case realloc()
+ 343:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    will behave identical to malloc().
+ 344:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 345:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    If the new memory cannot be allocated, realloc() returns NULL, and
+ 346:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    the region at \c ptr will not be changed.
+ 347:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 348:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern void *realloc(void *__ptr, size_t __size) __ATTR_MALLOC__;
+ 349:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 350:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern double strtod(const char *__nptr, char **__endptr);
+ 351:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 352:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /** \ingroup avr_stdlib
+ 353:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     \fn  double atof (const char *nptr)
+ 354:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 355:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     The atof() function converts the initial portion of the string pointed
+ 356:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     to by \a nptr to double representation.
+ 357:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 358:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     It is equivalent to calling
+ 359:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 	\code strtod(nptr, (char **)0); \endcode
+ 360:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****  */
+ 361:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern double atof(const char *__nptr);
+ 362:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 363:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /** Highest number that can be generated by rand(). */
+ 364:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #define	RAND_MAX 0x7FFF
+ 365:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 366:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 367:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      The rand() function computes a sequence of pseudo-random integers in the
+ 368:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      range of 0 to \c RAND_MAX (as defined by the header file <stdlib.h>).
+ 369:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 370:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      The srand() function sets its argument \c seed as the seed for a new
+ 371:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      sequence of pseudo-random numbers to be returned by rand().  These
+ 372:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      sequences are repeatable by calling srand() with the same seed value.
+ 373:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 374:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      If no seed value is provided, the functions are automatically seeded with
+ 375:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      a value of 1.
+ 376:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 377:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      In compliance with the C standard, these functions operate on
+ 378:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      \c int arguments.  Since the underlying algorithm already uses
+ 379:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      32-bit calculations, this causes a loss of precision.  See
+ 380:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      \c random() for an alternate set of functions that retains full
+ 381:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****      32-bit precision.
+ 382:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 383:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern int rand(void);
+ 384:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 385:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    Pseudo-random number generator seeding; see rand().
+ 386:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 387:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern void srand(unsigned int __seed);
+ 388:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 389:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 390:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    Variant of rand() that stores the context in the user-supplied
+ 391:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    variable located at \c ctx instead of a static library variable
+ 392:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    so the function becomes re-entrant.
+ 393:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 394:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern int rand_r(unsigned long *__ctx);
+ 395:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /*@}*/
+ 396:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 397:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /*@{*/
+ 398:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /** \name Non-standard (i.e. non-ISO C) functions.
+ 399:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****  \ingroup avr_stdlib
+ 400:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 401:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** /**
+ 402:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    \brief Convert an integer to a string.
+ 403:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 404:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    The function itoa() converts the integer value from \c val into an
+ 405:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    ASCII representation that will be stored under \c s.  The caller
+ 406:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    is responsible for providing sufficient storage in \c s.
+ 407:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 408:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    \note The minimal size of the buffer \c s depends on the choice of
+ 409:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    radix. For example, if the radix is 2 (binary), you need to supply a buffer
+ 410:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    with a minimal length of 8 * sizeof (int) + 1 characters, i.e. one
+ 411:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    character for each bit plus one for the string terminator. Using a larger
+ 412:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    radix will require a smaller minimal buffer size.
+ 413:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 414:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    \warning If the buffer is too small, you risk a buffer overflow.
+ 415:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 416:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    Conversion is done using the \c radix as base, which may be a
+ 417:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    number between 2 (binary conversion) and up to 36.  If \c radix
+ 418:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    is greater than 10, the next digit after \c '9' will be the letter
+ 419:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    \c 'a'.
+ 420:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     
+ 421:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     If radix is 10 and val is negative, a minus sign will be prepended.
+ 422:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 
+ 423:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****    The itoa() function returns the pointer passed as \c s.
+ 424:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** */
+ 425:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #ifdef  __DOXYGEN__
+ 426:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern char *itoa(int val, char *s, int radix);
+ 427:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** #else
+ 428:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** extern __inline__ __ATTR_GNU_INLINE__
+ 429:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** char *itoa (int __val, char *__s, int __radix)
+ 655               		.loc 3 429 7 view .LVU210
+ 656               	.LBE62:
+ 430:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** {
+ 431:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     if (!__builtin_constant_p (__radix)) {
+ 657               		.loc 3 431 5 view .LVU211
+ 432:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 	extern char *__itoa (int, char *, int);
+ 433:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 	return __itoa (__val, __s, __radix);
+ 434:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     } else if (__radix < 2 || __radix > 36) {
+ 658               		.loc 3 434 12 view .LVU212
+ 659               	.LBB64:
+ 660               	.LBB63:
+ 435:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 	*__s = 0;
+ 436:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 	return __s;
+ 437:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h ****     } else {
+ 438:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 	extern char *__itoa_ncheck (int, char *, unsigned char);
+ 661               		.loc 3 438 2 view .LVU213
+ 439:c:\avr-gcc-10.1.0-x64-windows\avr\include\stdlib.h **** 	return __itoa_ncheck (__val, __s, __radix);
+ 662               		.loc 3 439 2 view .LVU214
+ 663               		.loc 3 439 9 is_stmt 0 view .LVU215
+ 664 0182 4AE0      		ldi r20,lo8(10)
+ 665 0184 BE01      		movw r22,r28
+ 666 0186 6F5F      		subi r22,-1
+ 667 0188 7F4F      		sbci r23,-1
+ 668               	.LVL44:
+ 669               		.loc 3 439 9 view .LVU216
+ 670 018a 0E94 0000 		call __itoa_ncheck
+ 671               	.LVL45:
+ 672               		.loc 3 439 9 view .LVU217
+ 673               	.LBE63:
+ 674               	.LBE64:
+ 675               		.loc 1 99 2 view .LVU218
+ 676 018e 0E94 0000 		call lcd_text
+ 677               	.LVL46:
+ 678               	/* epilogue start */
+ 100:LCD.c         **** }
+ 679               		.loc 1 100 1 view .LVU219
+ 680 0192 2A96      		adiw r28,10
+ 681 0194 0FB6      		in __tmp_reg__,__SREG__
+ 682 0196 F894      		cli
+ 683 0198 DEBF      		out __SP_H__,r29
+ 684 019a 0FBE      		out __SREG__,__tmp_reg__
+ 685 019c CDBF      		out __SP_L__,r28
+ 686 019e DF91      		pop r29
+ 687 01a0 CF91      		pop r28
+ 688 01a2 0895      		ret
+ 689               		.cfi_endproc
+ 690               	.LFE18:
+ 692               	.global	goto_xy
+ 694               	goto_xy:
+ 695               	.LVL47:
+ 696               	.LFB19:
+ 101:LCD.c         **** void goto_xy (uint8_t x, uint8_t y)
+ 102:LCD.c         **** {
+ 697               		.loc 1 102 1 is_stmt 1 view -0
+ 698               		.cfi_startproc
+ 699               	/* prologue: function */
+ 700               	/* frame size = 0 */
+ 701               	/* stack size = 0 */
+ 702               	.L__stack_usage = 0
+ 103:LCD.c         **** 	uint8_t addr=0;
+ 703               		.loc 1 103 2 view .LVU221
+ 104:LCD.c         **** 	if(y==0) addr=0x00+x;
+ 704               		.loc 1 104 2 view .LVU222
+ 705               		.loc 1 104 4 is_stmt 0 view .LVU223
+ 706 01a4 6623      		tst r22
+ 707 01a6 01F0      		breq .L21
+ 105:LCD.c         **** 	if(y==1) addr=0x40+x;
+ 708               		.loc 1 105 2 is_stmt 1 view .LVU224
+ 709               		.loc 1 105 15 is_stmt 0 view .LVU225
+ 710 01a8 805C      		subi r24,lo8(-(64))
+ 711               	.LVL48:
+ 712               		.loc 1 105 4 view .LVU226
+ 713 01aa 6130      		cpi r22,lo8(1)
+ 714 01ac 01F0      		breq .L21
+ 103:LCD.c         **** 	uint8_t addr=0;
+ 715               		.loc 1 103 10 view .LVU227
+ 716 01ae 80E0      		ldi r24,0
+ 717               	.LVL49:
+ 718               	.L21:
+ 106:LCD.c         **** 	lcd_write_cmd((1<<7) | addr);
+ 719               		.loc 1 106 2 is_stmt 1 view .LVU228
+ 720 01b0 8068      		ori r24,lo8(-128)
+ 721               	.LVL50:
+ 722               		.loc 1 106 2 is_stmt 0 view .LVU229
+ 723 01b2 0C94 0000 		jmp lcd_write_cmd
+ 724               	.LVL51:
+ 725               		.loc 1 106 2 view .LVU230
+ 726               		.cfi_endproc
+ 727               	.LFE19:
+ 729               	.global	lcd_image
+ 731               	lcd_image:
+ 732               	.LFB20:
+ 107:LCD.c         **** }
+ 108:LCD.c         **** void lcd_image(void)
+ 109:LCD.c         **** {
+ 733               		.loc 1 109 1 is_stmt 1 view -0
+ 734               		.cfi_startproc
+ 735               	/* prologue: function */
+ 736               	/* frame size = 0 */
+ 737               	/* stack size = 0 */
+ 738               	.L__stack_usage = 0
+ 110:LCD.c         **** 	lcd_write_cmd((1<<6));
+ 739               		.loc 1 110 2 view .LVU232
+ 740 01b6 80E4      		ldi r24,lo8(64)
+ 741 01b8 0E94 0000 		call lcd_write_cmd
+ 742               	.LVL52:
+ 111:LCD.c         **** 	lcd_write_data(0);
+ 743               		.loc 1 111 2 view .LVU233
+ 744 01bc 80E0      		ldi r24,0
+ 745 01be 0E94 0000 		call lcd_write_data
+ 746               	.LVL53:
+ 112:LCD.c         **** 	lcd_write_data(20);
+ 747               		.loc 1 112 2 view .LVU234
+ 748 01c2 84E1      		ldi r24,lo8(20)
+ 749 01c4 0E94 0000 		call lcd_write_data
+ 750               	.LVL54:
+ 113:LCD.c         **** 	lcd_write_data(27);
+ 751               		.loc 1 113 2 view .LVU235
+ 752 01c8 8BE1      		ldi r24,lo8(27)
+ 753 01ca 0E94 0000 		call lcd_write_data
+ 754               	.LVL55:
+ 114:LCD.c         **** 	lcd_write_data(30);
+ 755               		.loc 1 114 2 view .LVU236
+ 756 01ce 8EE1      		ldi r24,lo8(30)
+ 757 01d0 0E94 0000 		call lcd_write_data
+ 758               	.LVL56:
+ 115:LCD.c         **** 	lcd_write_data(27);
+ 759               		.loc 1 115 2 view .LVU237
+ 760 01d4 8BE1      		ldi r24,lo8(27)
+ 761 01d6 0E94 0000 		call lcd_write_data
+ 762               	.LVL57:
+ 116:LCD.c         **** 	lcd_write_data(27);
+ 763               		.loc 1 116 2 view .LVU238
+ 764 01da 8BE1      		ldi r24,lo8(27)
+ 765 01dc 0E94 0000 		call lcd_write_data
+ 766               	.LVL58:
+ 117:LCD.c         **** 	lcd_write_data(20);
+ 767               		.loc 1 117 2 view .LVU239
+ 768 01e0 84E1      		ldi r24,lo8(20)
+ 769 01e2 0E94 0000 		call lcd_write_data
+ 770               	.LVL59:
+ 118:LCD.c         **** 	lcd_write_data(0);
+ 771               		.loc 1 118 2 view .LVU240
+ 772 01e6 80E0      		ldi r24,0
+ 773 01e8 0C94 0000 		jmp lcd_write_data
+ 774               	.LVL60:
+ 775               		.cfi_endproc
+ 776               	.LFE20:
+ 778               	.Letext0:
+ 779               		.file 4 "c:\\avr-gcc-10.1.0-x64-windows\\avr\\include\\stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 LCD.c
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:2      *ABS*:000000000000003e __SP_H__
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:3      *ABS*:000000000000003d __SP_L__
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:4      *ABS*:000000000000003f __SREG__
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:5      *ABS*:0000000000000000 __tmp_reg__
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:6      *ABS*:0000000000000001 __zero_reg__
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:11     .text:0000000000000000 lcd_send_half_byte
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:85     .text:000000000000002e lcd_write_byte
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:165    .text:000000000000005c lcd_write_cmd
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:185    .text:0000000000000062 lcd_write_data
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:205    .text:0000000000000068 lcdinit
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:489    .text:000000000000012e lcd_clr
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:530    .text:0000000000000142 lcd_cursor_return
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:571    .text:0000000000000156 lcd_text
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:619    .text:000000000000016e lcd_int
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:694    .text:00000000000001a4 goto_xy
+C:\Users\toaad\AppData\Local\Temp\ccGJXNWb.s:731    .text:00000000000001b6 lcd_image
+
+UNDEFINED SYMBOLS
+__itoa_ncheck
